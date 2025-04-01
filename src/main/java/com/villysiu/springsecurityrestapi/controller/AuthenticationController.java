@@ -13,12 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,22 +30,26 @@ public class AuthenticationController {
 
     @Autowired
     private final AuthenticationService authenticationService;
-
+    private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response){
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
         try {
-            String email = authenticationService.login(loginRequest, response);
+            String username = authenticationService.login(loginRequest);
 
-            return new ResponseEntity<>(email+" signed in", HttpStatus.OK);
+            Map<String, String> message = new HashMap<>();
+            message.put("message", "Hello " + username + ". You have successfully logged in with valid credentials!.");
+            return new ResponseEntity<>(message, HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            Map<String, String> message = new HashMap<>();
+            message.put("message", e.getMessage());
+            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
         }
 
     }
@@ -51,16 +59,19 @@ public class AuthenticationController {
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest, HttpServletRequest request){
         try {
             authenticationService.registerAccount(signupRequest);
-            return new ResponseEntity<>("Account registered.", HttpStatus.CREATED);
+            return new ResponseEntity<>("{\"message\":  \"Account registered!\"}", HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            Map<String, String> message = new HashMap<>();
+            message.put("message", e.getMessage());
+            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
         }
 
     }
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser(HttpServletResponse response) {
+    public ResponseEntity<?> logoutUser(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        logoutHandler.logout(request, response, authentication);
         authenticationService.logoutUser(response);
-        return new ResponseEntity("You've been signed out!", HttpStatus.OK);
+        return new ResponseEntity<>("{\"message\":  \"You've been signed out!\"}", HttpStatus.OK);
     }
 }

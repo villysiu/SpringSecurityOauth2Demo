@@ -46,5 +46,9 @@ public class Account {
         this.password = password;
 
     }
+    public Account(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
+    }
 
 }

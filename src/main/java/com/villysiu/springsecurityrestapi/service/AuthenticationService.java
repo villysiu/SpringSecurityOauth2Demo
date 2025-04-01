@@ -43,20 +43,22 @@ public class AuthenticationService {
         this.accountRepository = accountRepository;
         this.jwtService = jwtService;
     }
-    public String login(LoginRequest loginRequest, HttpServletResponse response) {
+    public String login(LoginRequest loginRequest) {
 
         Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getEmail(), loginRequest.getPassword());
         Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
 
         SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
 
-        jwtService.generateToken(loginRequest.getEmail(), response);
+        String jwt = jwtService.generateToken(loginRequest.getEmail());
+        jwtService.saveJwtToCookie(jwt);
 
 
-        UserDetails userDetails = (UserDetails) authenticationResponse.getPrincipal();
+//        UserDetails userDetails = (UserDetails) authenticationResponse.getPrincipal();
 
 //        System.out.println("email: " + email);
-        return userDetails.getUsername();
+//        return userDetails.getUsername();
+        return loginRequest.getEmail();
     }
     public void registerAccount(SignupRequest signupRequest){
 
@@ -74,6 +76,7 @@ public class AuthenticationService {
 
     }
     public void logoutUser(HttpServletResponse response){
+
         jwtService.removeTokenFromCookie(response);
     }
 }

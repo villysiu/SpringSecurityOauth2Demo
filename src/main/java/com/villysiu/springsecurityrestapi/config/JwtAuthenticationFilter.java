@@ -21,8 +21,10 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
+
     public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
         this.jwtService = jwtService;
         this.customUserDetailsService = customUserDetailsService;
@@ -33,26 +35,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+        logger.info("JWT Authentication Filter");
         try {
             String jwt = jwtService.getJwtFromCookie(request);
+            if(jwt == null) {
+                throw new ServletException("JWT cookie not found");
+            }
             jwtService.validateToken(jwt);
+
             String userEmail = jwtService.extractEmail();
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authToken);
+            logger.info("Set SecurityContextHolder to {}", context);
             SecurityContextHolder.setContext(context);
 
 
         } catch (Exception e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
-//            e.printStackTrace();
 
+            jwtService.removeTokenFromCookie(response);
         }
         filterChain.doFilter(request, response);
     }
