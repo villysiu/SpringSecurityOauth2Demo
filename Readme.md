@@ -10,7 +10,8 @@ Upon successful login, either authenticated by email/password or Github,
 - a JWT token will be generated and stored in cookie which is automatically sent with every request within thwe same domain.
 - The browser automatically includes this cookie in subsequent requests to the server (if it's within the same domain).
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/LYDzl2VVj48?si=5iYZLEngYkjYozzG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[youtube](<iframe width="560" height="315" src="https://www.youtube.com/embed/LYDzl2VVj48?si=5iYZLEngYkjYozzG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+) 
 
 Since both Postmand and Insomnia do not support redirection within the Oauth2Login, 
 We will be using the browser to demostarte the authentiation process with Github. 
