@@ -5,17 +5,17 @@ This application allows user to
 - sign up with email and password
 - login with valid credential
 - login through GitHub authentication by OAuth 2.0
-Upon successful login, either authenticated by email/password or Github, 
-- the authenticated user will be persisted in teh SecurityContextHolder in Spring Security.
-- a JWT token will be generated and stored in cookie which is automatically sent with every request within thwe same domain.
+Upon successful login, either authenticated by email/password or GitHub, 
+- the authenticated user will be persisted in the SecurityContextHolder in Spring Security.
+- a JWT token will be generated and stored in cookie which is automatically sent with every request within the same domain.
 - The browser automatically includes this cookie in subsequent requests to the server (if it's within the same domain).
 
 [![Authentication by Github in Springboot ](https://markdown-videos-api.jorgenkh.no/url?url=https%3A%2F%2Fyoutu.be%2FLYDzl2VVj48)](https://youtu.be/LYDzl2VVj48)
 
 
 
-Since both Postmand and Insomnia do not support redirection within the Oauth2Login, 
-We will be using the browser to demostarte the authentiation process with Github. 
+Since both Postman and Insomnia do not support redirection within the Oauth2Login, 
+We will be using the browser to demonstrate the authentication process with GitHub. 
 
 The configuration of my system
 * Intellij Idea
@@ -29,7 +29,7 @@ Maven dependencies for the project:
 * Spring Web
 * Spring Client
 * Spring Resource Server
-* Lombak
+* Lombok
 * JDBC API
 * Spring Data JPA
 * MySQL
@@ -38,7 +38,7 @@ Maven dependencies for the project:
 ## Cloning the project
 Clone the project from  https://github.com/villysiu/SpringSecurityOauth2Demo.git, and open it in Intellij.
 
-**DO NOT RUN IT YET** as we still need to configure database and github app.
+**DO NOT RUN IT YET** as we still need to configure database and GitHub app.
 
 ## Create Database
 
@@ -51,7 +51,7 @@ spring.datasource.password = <-- MySQL password  -->
 
 ```
 
-## Configure Github App ##
+## Configure GitHub App ##
 Next, you need to configure your app to use GitHub as the authentication provider.
 
 1. To add a new GitHub app, visit https://github.com/settings/developers
@@ -85,7 +85,7 @@ This project is developed on top of [SpringSecurityRestAPIJWTDemo](https://githu
 The following addition makes the project ready to be authenticated be GitHub.
 
 In `pom.xml`, we added new dependencies for OAuth 2.0
-```json
+```
 <dependency>
     <groupId>org.springframework.security</groupId>
     <artifactId>spring-security-oauth2-resource-server</artifactId>
@@ -103,7 +103,7 @@ In `pom.xml`, we added new dependencies for OAuth 2.0
 ```
 
 In `SecureConfig`, we added 
-```json
+```
 .oauth2Login(config -> config
     .authorizedClientService(this.customAuthorizedClientService)
     .defaultSuccessUrl("/secure/github_login_success", true)
@@ -112,7 +112,7 @@ In `SecureConfig`, we added
 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
 ```
 
-### Github Authentication
+### GitHub Authentication
 
 To authenticate by GitHub, we will visit the link, `http://localhost:8080/oauth2/authorization/github` in the browser, 
 or in frontend through a button. We will be redirected to a default GitHub page to enter out GitHub credentials. 
