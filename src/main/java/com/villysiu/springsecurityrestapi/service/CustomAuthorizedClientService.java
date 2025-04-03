@@ -1,14 +1,10 @@
-package com.villysiu.springsecurityrestapi.config;
+package com.villysiu.springsecurityrestapi.service;
 
 import com.villysiu.springsecurityrestapi.model.Account;
 import com.villysiu.springsecurityrestapi.model.ERole;
 import com.villysiu.springsecurityrestapi.model.Role;
 import com.villysiu.springsecurityrestapi.repository.AccountRepository;
 import com.villysiu.springsecurityrestapi.repository.RoleRepository;
-import com.villysiu.springsecurityrestapi.service.CustomUserDetailsService;
-import com.villysiu.springsecurityrestapi.service.JwtService;
-import jakarta.persistence.EntityExistsException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,10 +56,7 @@ public class CustomAuthorizedClientService  implements OAuth2AuthorizedClientSer
 
         String jwt = jwtService.generateToken(email);
         jwtService.saveJwtToCookie(jwt);
-        OAuth2AccessToken accessToken = client.getAccessToken();
-        System.out.println(accessToken);
-        System.out.println(accessToken.getTokenValue());
-//        jwtService.saveJwtToCookie(accessToken);
+
     }
 
     @Override

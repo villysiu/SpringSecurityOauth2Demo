@@ -1,13 +1,11 @@
 package com.villysiu.springsecurityrestapi.config;
 
-import com.villysiu.springsecurityrestapi.service.CustomUserDetailsService;
+import com.villysiu.springsecurityrestapi.service.CustomAuthorizedClientService;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,8 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,9 +21,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -38,14 +35,13 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthorizedClientService customAuthorizedClientService;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
 
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthorizedClientService customAuthorizedClientService, AuthenticationSuccessHandler authenticationSuccessHandler) {
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthorizedClientService customAuthorizedClientService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.customAuthorizedClientService = customAuthorizedClientService;
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 @Value("${jwt.token.secret}")
 private String secret;
@@ -66,9 +62,7 @@ private String secret;
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-//                .oauth2Login(withDefaults())
                 .oauth2Login(config -> config
-//                        .successHandler(authenticationSuccessHandler)
                         .authorizedClientService(this.customAuthorizedClientService)
                         .defaultSuccessUrl("/secure/github_login_success", true)
                 )
@@ -103,6 +97,17 @@ private String secret;
     public JwtDecoder jwtDecoder() {
         byte[] keyBytes = Decoders.BASE64.decode(this.secret);
         return NimbusJwtDecoder.withSecretKey(Keys.hmacShaKeyFor(keyBytes)).build();
+    }
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 
