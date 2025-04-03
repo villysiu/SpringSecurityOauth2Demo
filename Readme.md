@@ -35,6 +35,63 @@ Maven dependencies for the project:
 * MySQL
 * Json Web token
 
+# About the project
+
+This project is developed on top of [SpringSecurityRestAPIJWTDemo](https://github.com/villysiu/SpringSecurityRestAPIJWTDemo.git)
+The following addition makes the project ready to be authenticated be GitHub.
+
+In `pom.xml`, we added new dependencies for OAuth 2.0
+```
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-oauth2-resource-server</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-oauth2-jose</artifactId>
+    <version>6.4.4</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>
+```
+
+In `SecureConfig`, we added
+```
+.oauth2Login(config -> config
+    .authorizedClientService(this.customAuthorizedClientService)
+    .defaultSuccessUrl("/secure/github_login_success", true)
+)
+
+.oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+```
+
+### GitHub Authentication
+
+To authenticate by GitHub, we will visit the link, `http://localhost:8080/oauth2/authorization/github` in the browser,
+or in frontend through a button. We will be redirected to a default GitHub page to enter out GitHub credentials.
+Once authenticated,
+Behind the scene, the Spring Security and Oauth 2.0 will do the following:
+* obtain a code from GitHub
+* exchange an access token with the code from GitHub
+* request user information with the access token
+* the user information will be saved in the SecurityContextHolder with authentication info.
+  We can access this OAuth2User through Authentication.
+
+
+### CustomAuthorizedClientService
+
+we customized `OAuth2AuthorizedClientService` so we can save the authenticated OAuth2User into our `Account` database if it is not already existed.
+Then we generated a JWT token with the email from the Oauth2User object.
+
+### /secure/github_login_success
+When we are redirected to  `/secure/github_login_success`, we will hit the JwtAuthenticationFilter first, which will validate the JWT token in the cookie, and persisted the UserDetails object in the SecurityContextHolder,
+which can be accessed from Authentication.
+
+
+
 ## Cloning the project
 Clone the project from  https://github.com/villysiu/SpringSecurityOauth2Demo.git, and open it in Intellij.
 
@@ -77,62 +134,6 @@ GITHUB_SECRET: [secret]
 
 ## Running the project
 Now we are ready to run the application. 
-
-
-# About the project
-
-This project is developed on top of [SpringSecurityRestAPIJWTDemo](https://github.com/villysiu/SpringSecurityRestAPIJWTDemo.git)
-The following addition makes the project ready to be authenticated be GitHub.
-
-In `pom.xml`, we added new dependencies for OAuth 2.0
-```
-<dependency>
-    <groupId>org.springframework.security</groupId>
-    <artifactId>spring-security-oauth2-resource-server</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>org.springframework.security</groupId>
-    <artifactId>spring-security-oauth2-jose</artifactId>
-    <version>6.4.4</version>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-oauth2-client</artifactId>
-</dependency>
-```
-
-In `SecureConfig`, we added 
-```
-.oauth2Login(config -> config
-    .authorizedClientService(this.customAuthorizedClientService)
-    .defaultSuccessUrl("/secure/github_login_success", true)
-)
-
-.oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-```
-
-### GitHub Authentication
-
-To authenticate by GitHub, we will visit the link, `http://localhost:8080/oauth2/authorization/github` in the browser, 
-or in frontend through a button. We will be redirected to a default GitHub page to enter out GitHub credentials. 
-Once authenticated, 
-Behind the scene, the Spring Security and Oauth 2.0 will do the following:
-* obtain a code from GitHub
-* exchange an access token with the code from GitHub
-* request user information with the access token
-* the user information will be saved in the SecurityContextHolder with authentication info. 
-We can access this OAuth2User through Authentication.
-
-
-### CustomAuthorizedClientService
-
-we customized `OAuth2AuthorizedClientService` so we can save the authenticated OAuth2User into our `Account` database if it is not already existed.
-Then we generated a JWT token with the email from the Oauth2User object. 
-
-### /secure/github_login_success
-When we are redirected to  `/secure/github_login_success`, we will hit the JwtAuthenticationFilter first, which will validate the JWT token in the cookie, and persisted the UserDetails object in the SecurityContextHolder,
-which can be accessed from Authentication. 
 
 
 
