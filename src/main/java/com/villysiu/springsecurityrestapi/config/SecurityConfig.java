@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,8 +34,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthorizedClientService customAuthorizedClientService;
-
-
 
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthorizedClientService customAuthorizedClientService) {
@@ -79,6 +76,8 @@ private String secret;
         return http.build();
     }
 
+
+
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -109,8 +108,10 @@ private String secret;
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-
+//    @Bean
+//    public CustomOAuth2AuthorizationSuccessHandler customOAuth2AuthorizationSuccessHandler() {
+//        return new CustomOAuth2AuthorizationSuccessHandler();
+//    }
 }
 
 

@@ -1,5 +1,6 @@
 package com.villysiu.springsecurityrestapi.repository;
 
+import com.fasterxml.jackson.databind.ser.std.StdArraySerializers;
 import com.villysiu.springsecurityrestapi.model.ERole;
 import com.villysiu.springsecurityrestapi.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
     Optional<Role> findByErole(ERole erole);
+    Boolean existsByErole(ERole erole);
 }
