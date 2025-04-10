@@ -30,7 +30,7 @@ public class Account {
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "Password is required")
+//    @NotBlank(message = "Password is required")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER )
@@ -45,10 +45,6 @@ public class Account {
         this.email = email;
         this.password = password;
 
-    }
-    public Account(String nickname, String email) {
-        this.nickname = nickname;
-        this.email = email;
     }
 
 }

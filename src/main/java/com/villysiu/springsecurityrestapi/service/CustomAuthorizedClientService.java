@@ -46,7 +46,7 @@ public class CustomAuthorizedClientService  implements OAuth2AuthorizedClientSer
 
         if (!accountRepository.existsByEmail(email)) {
             logger.info("Account with email {} does not exist", email);
-            Account account = new Account(nickname, email, "nopassword1");
+            Account account = new Account(nickname, email,"");
             Role role = roleRepository.findByErole(ERole.ROLE_USER).orElse(null);
             account.setRoles(Collections.singleton(role));
             logger.info("Saving account {}", account);
